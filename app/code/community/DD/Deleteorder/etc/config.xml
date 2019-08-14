@@ -1,0 +1,175 @@
+<?xml version="1.0"?>
+<!--
+* Dynamic Dreamz
+* @category   DD
+* @package    DD_Deleteorder
+* @copyright  Copyright (c) 2014-2015 Dynamic Dreamz. (http://www.dynamicdreamz.com/)
+* @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL)
+-->
+<config>
+    <modules>
+        <DD_Deleteorder>
+            <version>0.1.0</version>
+        </DD_Deleteorder>
+    </modules>
+    <default>
+        <deleteordersettings>
+            <general>                
+                <enable>0</enable>
+                <enablegriddelete>1</enablegriddelete>         
+                <orderdeletehistory>1</orderdeletehistory>  
+                <enableorderviewdelete>0</enableorderviewdelete>  
+                <showrolefields>0</showrolefields>         
+            </general>      
+        </deleteordersettings>
+    </default>
+    <global>
+        <helpers>
+            <deleteorder>
+                <class>DD_Deleteorder_Helper</class>
+            </deleteorder>
+        </helpers>
+        <blocks>
+            <deleteorder>
+                <class>DD_Deleteorder_Block</class>
+            </deleteorder>
+            <adminhtml>
+                <rewrite>
+                    <sales_order_grid>DD_Deleteorder_Block_Adminhtml_Sales_Order_Grid</sales_order_grid>
+                </rewrite>
+            </adminhtml>
+            <adminhtml>
+                <rewrite>
+                    <sales_order_view>DD_Deleteorder_Block_Adminhtml_Sales_Order_View</sales_order_view>
+                </rewrite>
+            </adminhtml>
+        </blocks>
+        <models>
+            <deleteorder>
+                <class>DD_Deleteorder_Model</class>
+                <resourceModel>deleteorder_mysql4</resourceModel>
+            </deleteorder>
+            <deleteorder_mysql4>
+                <class>DD_Deleteorder_Model_Mysql4</class>
+                <entities>		  
+                    <deleteorder>
+                        <table>delete_sales_flat_order</table>
+                    </deleteorder>
+                    <deleteorderitem>
+                        <table>delete_sales_flat_order_item</table>
+                    </deleteorderitem>
+                    <deleteorderaddress>
+                        <table>delete_sales_flat_order_address</table>
+                    </deleteorderaddress>
+                </entities>
+            </deleteorder_mysql4>
+        </models>
+        <events>
+            <adminhtml_block_html_before>
+                <observers>
+                    <deleteorder_init_system_observer>
+                        <class>deleteorder/observer</class>
+                        <method>makeMenu</method>
+                    </deleteorder_init_system_observer>
+                </observers>
+            </adminhtml_block_html_before>
+            
+            <adminhtml_init_system_config>
+                <observers>
+                    <deleteorder_init_system_config>
+                        <class>deleteorder/observer</class>
+                        <method>makeSystemConfig</method>
+                    </deleteorder_init_system_config>
+                </observers>
+            </adminhtml_init_system_config>
+            
+            <admin_system_config_changed_section_deleteordersettings>
+                <observers>
+                    <deleteorder>
+                        <type>singleton</type>
+                        <class>deleteorder/observer</class>
+                        <method>send</method>
+                    </deleteorder>
+                </observers>
+            </admin_system_config_changed_section_deleteordersettings>
+        </events>
+        <resources>
+            <deleteorder_setup>
+                <setup>
+                    <module>DD_Deleteorder</module>
+                </setup>
+                <connection>
+                    <use>core_setup</use>
+                </connection>
+            </deleteorder_setup>
+            <deleteorder_write>
+                <connection>
+                    <use>core_write</use>
+                </connection>
+            </deleteorder_write>
+            <deleteorder_read>
+                <connection>
+                    <use>core_read</use>
+                </connection>
+            </deleteorder_read>
+        </resources>
+    </global>
+    <admin>
+        <routers>
+            <deleteorder>
+                <use>admin</use>
+                <args>
+                    <module>DD_Deleteorder</module>
+                    <frontName>admin_deleteorder</frontName>
+                </args>
+            </deleteorder>
+        </routers>
+    </admin>
+    <adminhtml>
+        <menu>
+            <!-- for menu look in observer -->
+        </menu>
+        <acl>
+            <resources>
+                <all>
+                    <title>Allow Everything</title>
+                </all>
+                <admin>
+                    <children>
+                        <deleteorder translate="title" module="deleteorder">
+                            <title>Deleteorder</title>
+                            <sort_order>1000</sort_order>
+                            <children>
+                                <deleteorder module="deleteorder">
+                                    <title>Delete Orders</title>
+                                    <sort_order>0</sort_order>
+                                    <children>
+                                        <deletefromordergrid module="deleteorder">
+                                            <title>Delete From Order Grid</title>
+                                            <sort_order>0</sort_order>
+                                        </deletefromordergrid>
+                                        <manualdelete module="deleteorder">
+                                            <title>Manual Delete</title>
+                                            <sort_order>1</sort_order>
+                                        </manualdelete>
+                                    </children>
+                                </deleteorder>
+                                <deletehistory translate="title">
+                                    <title>Delete Orders History</title>
+                                    <sort_order>1</sort_order>
+                                </deletehistory>
+                            </children>
+                        </deleteorder>
+                    </children>
+                </admin>
+            </resources>
+        </acl>
+        <layout>
+            <updates>
+                <deleteorder>
+                    <file>deleteorder.xml</file>
+                </deleteorder>
+            </updates>
+        </layout>
+    </adminhtml>
+</config> 

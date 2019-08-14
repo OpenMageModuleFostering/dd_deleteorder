@@ -1,0 +1,16 @@
+{
+    "name": "OpenMageModuleFostering/DD_Deleteorder",
+    "type": "magento-module",
+    "license": "Open-Software-License-(OSL)",
+    "homepage": "",
+    "description": "By this extension admin can delete the orders and backed up the deleted orders history.",
+    "authors": [
+    {
+        "name": "Dynamic Dreamz",
+        "email": "info@dynamicdreamz.com"
+    }
+],
+    "suggest": {
+        "magento-hackathon/magento-composer-installer": "*"
+    }
+}

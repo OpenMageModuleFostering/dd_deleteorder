@@ -1,0 +1,416 @@
+<?php
+/**
+ * Dynamic Dreamz
+ * @category   design
+ * @package    default_default
+ * @copyright  Copyright (c) 2014-2015 Dynamic Dreamz. (http://www.dynamicdreamz.com/)
+ * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL)
+ */
+?>
+<?php
+$id = $this->getRequest()->getParam('o_id');
+$data = Mage::getModel('deleteorder/deleteorder')->getOrderInfo($id);
+if($data){
+    try{
+        $itemData = Mage::getModel('deleteorder/deleteorderitem')->getOrderItem($data['entity_id']);
+        $shippingData = Mage::getModel('deleteorder/deleteorderaddress')->getOrderShippingData($data['entity_id']);
+        $billingData = Mage::getModel('deleteorder/deleteorderaddress')->getOrderBillingData($data['entity_id']);
+        $countryShipping = Mage::getModel('directory/country')->loadByCode($shippingData['country_id']);
+        $countryBilling = Mage::getModel('directory/country')->loadByCode($billingData['country_id']);
+        $orderAdminDate = $this->formatDate($data['created_at'], 'medium', true);
+        $showIp=Mage::getStoreConfig('sales/general/hide_customer_ip');
+        $currencySymbol = Mage::app()->getLocale()->currency($data['order_currency_code'])->getSymbol();
+?>
+
+<div class="box-left">
+    <!--Order Information-->
+    <div class="entry-edit">
+        <?php
+        if ($data['email_sent']):
+            $_email = Mage::helper('sales')->__('the order confirmation email was sent');
+        else:
+            $_email = Mage::helper('sales')->__('the order confirmation email is not sent');
+        endif;
+        ?>
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-account"><?php echo Mage::helper('sales')->__('Order # %s', $data['increment_id']) ?> (<?php echo $_email ?>)</h4>
+        </div>
+        <div class="fieldset">
+            <table cellspacing="0" class="form-list">
+                <tr>
+                    <td class="label"><label><?php echo Mage::helper('sales')->__('Order Date'); ?></label></td>
+                    <td class="value"><strong><?php echo $orderAdminDate ?></strong></td>
+                </tr>
+                <tr>
+                    <td class="label"><label><?php echo Mage::helper('sales')->__('Order Status') ?></label></td>
+                    <td class="value"><strong><span id="order_status"><?php echo $data['status'] ?></span></strong></td>
+                </tr>
+                <tr>
+                    <td class="label"><label><?php echo Mage::helper('sales')->__('Purchased From') ?></label></td>
+                    <td class="value"><strong><?php echo nl2br($data['store_name']);?></strong></td>
+                </tr>
+
+                <?php if (!$showIp && $data['remote_ip']): ?>
+                    <tr>
+                        <td class="label"><label><?php echo Mage::helper('sales')->__('Placed from IP') ?></label></td>
+                        <td class="value"><strong><?php echo $data['remote_ip']; ?>
+                    </tr>
+                <?php endif;
+                ?>
+                <tr>
+                    <td class="label"><label><?php echo Mage::helper('sales')->__('Order Deleted Date'); ?></label></td>
+                    <td class="value"><strong><?php echo $this->formatDate($data['order_delete_date'], 'medium', true); ?></strong></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="box-right">
+    <!--Account Information-->
+    <div class="entry-edit">
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-account"><?php echo Mage::helper('sales')->__('Account Information') ?></h4>
+            <div class="tools"><?php ?></div>
+        </div>
+        <div class="fieldset">
+            <div class="hor-scroll">
+                <table cellspacing="0" class="form-list">
+                    <tr>
+                        <td class="label"><label><?php echo Mage::helper('sales')->__('Customer Name') ?></label></td>
+                        <td class="value">
+                            <strong><?php echo $this->escapeHtml($data['customer_firstname'] . ' ' . $data['customer_lastname']); ?></strong>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label><?php echo Mage::helper('sales')->__('Email') ?></label></td>
+                        <td class="value"><strong  class="emph"><?php echo $data['customer_email']; ?></strong></td>
+                    </tr>
+                        <tr>
+                            <?php $_groupName = $data['customer_group_id']; ?>
+                                <?php $customerGroup= Mage::getModel('customer/group')->load((int) $_groupName)->getCode(); ?>
+                                <?php if($customerGroup == ''): ?>
+                            <?php elseif($customerGroup != ''): ?>
+                                <td class="label"><label><?php echo Mage::helper('sales')->__('Customer Group') ?></label></td>
+                                <td class="value"><strong><?php echo $customerGroup; ?></strong></td>
+                            <?php else: ?>
+                                <td class="label"><label><?php echo Mage::helper('sales')->__('Customer Group') ?></label></td>
+                                <td class="value"><strong><?php echo $this->__('NOT LOGGED IN'); ?></strong></td>
+                            <?php endif; ?>
+                        </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="clear"></div>
+
+<div class="box-left">
+    <!--Billing Address-->
+    <div class="entry-edit">
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-billing-address"><?php echo Mage::helper('sales')->__('Billing Address') ?></h4>
+            <div class="tools"><?php ?></div>
+        </div>
+        <fieldset>
+            <address>
+                <?php
+                echo $billingData['firstname'] . ' ';
+                if ($billingData['middlename'] != '') {
+                    echo $billingData['middlename'] . ' ';
+                }
+                echo $billingData['lastname'] . '<br/>';
+                if ($billingData['company'] != '') {
+                    echo $billingData['company'] . '<br/>';
+                }
+                echo $billingData['street'] . '<br/>';
+                echo $billingData['city'] . ' ';
+                echo $billingData['region'] . ' ';
+                echo $billingData['postcode'] . '<br/>';
+                echo $countryBilling->getName() . '<br/>';
+                echo 'T: ' . $billingData['telephone'] . '<br/>';
+                if ($billingData['fax'] != '') {
+                    echo 'F: ' . $billingData['fax'];
+                }
+                ?>
+            </address>
+        </fieldset>
+    </div>
+</div>
+
+<?php if (!$data['is_virtual']): ?>
+    <div class="box-right">
+        <!--Shipping Address-->
+        <div class="entry-edit">
+            <div class="entry-edit-head">
+                <h4 class="icon-head head-shipping-address"><?php echo Mage::helper('sales')->__('Shipping Address') ?></h4>
+                <div class="tools"><?php ?></div>
+            </div>
+            <fieldset>
+                <address>
+                    <?php
+                    echo $shippingData['firstname'] . ' ';
+                    if ($shippingData['middlename'] != '') {
+                        echo $shippingData['middlename'] . ' ';
+                    }
+                    echo $shippingData['lastname'] . '<br/>';
+                    if ($billingData['company'] != '') {
+                        echo $billingData['company'] . '<br/>';
+                    }
+                    echo $shippingData['street'] . '<br/>';
+                    echo $shippingData['city'] . ' ';
+                    echo $shippingData['region'] . ' ';
+                    echo $shippingData['postcode'] . '<br/>';
+                    echo $countryShipping->getName() . '<br/>';
+                    echo 'T: ' . $shippingData['telephone'] . '<br/>';
+                    if ($shippingData['fax'] != '') {
+                        echo 'F: ' . $shippingData['fax'];
+                    }
+                    ?>
+                </address>
+            </fieldset>
+        </div>
+    </div>
+    <div class="clear"></div>
+<?php endif; ?>
+
+<div class="box-left">
+    <!--Payment Method-->
+    <div class="entry-edit">
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-payment-method"><?php echo Mage::helper('sales')->__('Payment Information') ?></h4>
+        </div>
+        <fieldset>
+            <?php echo $data['payment_type'] ?>
+            <div><?php echo Mage::helper('sales')->__('Order was placed using %s', $data['order_currency_code']); ?></div>
+        </fieldset>
+    </div>
+</div>
+
+<?php if (!$data['is_virtual']): ?>
+    <div class="box-right">
+        <!--Shipping Method-->
+        <div class="entry-edit">
+            <div class="entry-edit-head">
+                <h4 class="icon-head head-shipping-method"><?php echo Mage::helper('sales')->__('Shipping &amp; Handling Information') ?></h4>
+            </div>
+            <fieldset>
+                <?php if ($data['shipping_description']): ?>
+                    <strong><?php echo $this->escapeHtml($data['shipping_description']); ?></strong>
+                    <?php if ($data['shipping_amount']): ?>
+                        <?php echo $currencySymbol . number_format($data['shipping_amount'], 2); ?>
+                    <?php endif; ?>
+                <?php else: ?>
+                    <?php echo $this->helper('sales')->__('No shipping information available'); ?>
+                <?php endif; ?>
+            </fieldset>
+        </div>
+    </div>
+<?php endif; ?>
+<div class="clear"></div>
+
+<div class="entry-edit">
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-products"><?php echo Mage::helper('sales')->__('Items Ordered') ?></h4>
+    </div>
+</div>
+<div class="grid np">
+  <div class="hor-scroll">
+    <table cellspacing="0" class="data order-tables">
+        <col />
+        <col width="1" />
+        <col width="1" />
+        <col width="1" />
+        <col width="1" />
+        <col width="1" />
+        <col width="1" />
+        <col width="1" />
+        <col width="1" />
+        <col width="1" />
+        <thead>
+            <tr class="headings">
+                <th><?php echo $this->helper('sales')->__('Product') ?></th>
+                <!--<th><span class="nobr"><?php // echo $this->helper('sales')->__('Item Status') ?></span></th>-->
+                <th><span class="nobr"><?php echo $this->helper('sales')->__('Original Price') ?></span></th>
+                <th><?php echo $this->helper('sales')->__('Price') ?></th>
+                <th class="a-center"><?php echo $this->helper('sales')->__('Qty') ?></th>
+                <th><?php echo $this->helper('sales')->__('Subtotal') ?></th>
+                <th><span class="nobr"><?php echo $this->helper('sales')->__('Tax Amount') ?></span></th>
+                <th><span class="nobr"><?php echo $this->helper('sales')->__('Tax Percent') ?></span></th>
+                <th><span class="nobr"><?php echo $this->helper('sales')->__('Discount Amount') ?></span></th>
+                <th class="last"><span class="nobr"><?php echo $this->helper('sales')->__('Row Total') ?></span></th>
+            </tr>
+        </thead>
+        <?php $i=0;foreach ($itemData as $_item):?>
+            <?php if ($_item['parent_item_id']) continue; else $i++;?>
+            <tbody class="<?php echo $i%2?'even':'odd' ?>">
+                <tr>
+                    <td>
+                        <div><strong><?php echo $_item['name'];?></strong></div>
+                        <div><strong><?php echo $this->__('SKU: ')?></strong><?php echo $_item['sku'];?></div>
+                        
+                        <?php if($_item['product_type']=='simple' || $_item['product_type']=='downloadable'|| $_item['product_type']=='virtual' || $_item['product_type']=='configurable'):?>
+                        <?php $customOptions=Mage::helper('deleteorder')->getOptions($_item['product_options']);?>
+                        <?php if(array_key_exists('options',$customOptions)): ?>
+                            <div>
+                                <dl class="item-options">
+                                    <?php foreach ($customOptions['options'] as $val):?>
+                                    <dt><strong><?php echo $val['label']?></strong></dt>
+                                    <dd><?php echo $val['value'];?></dd>
+                                    <?php endforeach;?>
+                                </dl>
+                            </div>
+                        <?php endif;?>
+                        <?php endif;?>
+                        
+                        <?php if($_item['product_type']=='configurable'):?>
+                        <?php $configurableOptions=Mage::helper('deleteorder')->getOptions($_item['product_options'])?>
+                        <?php if(array_key_exists('attributes_info',$configurableOptions)): ?>
+                            <div>
+                                <dl class="item-options">
+                                    <?php foreach ($configurableOptions['attributes_info'] as $val):?>
+                                    <dt><strong><?php echo $val['label']?></strong></dt>
+                                    <dd><?php echo $val['value'];?></dd>
+                                    <?php endforeach;?>
+                                </dl>
+                            </div>
+                        <?php endif;?>
+                        <?php endif;?>
+                        
+                        <?php if($_item['product_type']=='bundle'):?>
+                        <?php $bundleOptions=Mage::helper('deleteorder')->getOptions($_item['product_options'])?>
+                        <?php if(array_key_exists('bundle_options',$bundleOptions)): ?>
+                            <div>
+                                <dl class="item-options">
+                                    <?php foreach ($bundleOptions['bundle_options'] as $val):?>
+                                    <dt><strong><?php echo $val['label']?></strong></dt>
+                                    <dd>
+                                        <?php echo $val['value'][0]['title'].'<br/>';?>
+                                        <?php echo '<strong>'.$this->__('Price: ').$currencySymbol. number_format($val['value'][0]['price'], 2).'</strong><br/>';?>
+                                        <?php echo '<strong>'.$this->__('Qty: ').(int)$val['value'][0]['qty'].'</strong>';?>
+                                    </dd>
+                                    <?php endforeach;?>
+                                </dl>
+                            </div>
+                        <?php endif;?>
+                        <?php endif;?>
+                        
+                    </td>
+                    <td><?php echo $currencySymbol . number_format($_item['original_price'], 2);?></td>
+                    <td><strong><?php echo $currencySymbol . number_format($_item['price'], 2);?></strong></td>
+                    <td>
+                        <table class="qty-table" cellspacing="0">
+                            <?php if($_item['qty_ordered']!=0): ?>
+                            <tr><td><?php echo $this->__('Ordered ')?></td><td><strong><?php echo (int)$_item['qty_ordered'];?></strong></td></tr>
+                            <?php endif;?>
+                            <?php if($_item['qty_invoiced']!=0): ?>
+                            <tr><td><?php echo $this->__('Invoiced ')?></td><td><strong><?php echo (int)$_item['qty_invoiced'];?></strong></td></tr>
+                            <?php endif;?>
+                            <?php if($_item['qty_shipped']!=0): ?>
+                            <tr><td><?php echo $this->__('Shipped ')?></td><td><strong><?php echo (int)$_item['qty_shipped'];?></strong></td></tr>
+                            <?php endif;?>
+                        </table>
+                    </td>
+                    <td><strong><?php echo $currencySymbol . number_format($_item['row_total'], 2);?></strong></td>
+                    <td><?php echo $currencySymbol . number_format($_item['tax_amount'], 2);?></td>
+                    <td><?php echo number_format($_item['tax_percent'],2).'%';?></td>
+                    <td><?php echo $currencySymbol . number_format($_item['discount_amount'],2);?></td>
+                    <td><?php echo $currencySymbol . number_format((($_item['row_total']+$_item['tax_amount'])-$_item['discount_amount']), 2);?></td>
+                </tr>
+            </tbody>
+        <?php endforeach;?>
+    </table>
+  </div>
+</div>
+
+<div class="clear"></div>
+    <div class="box entry-edit">
+        <div class="entry-edit-head"><h4><?php echo Mage::helper('sales')->__('Order Totals') ?></h4></div>
+        <div class="order-totals">
+            <table cellspacing="0" width="100%">
+                <col />
+                <col width="1" />
+                <tfoot>
+                    <tr class="">
+                        <td class="label"><strong><?php echo $this->__('Grand Total'); ?></strong></td>
+                        <td class="emph">
+                            <strong>
+                                <?php echo $currencySymbol . number_format($data['grand_total'],2); ?>
+                            </strong>
+                        </td>
+                    </tr>
+                    <tr class="">
+                        <td class="label"><strong><?php echo $this->__('Total Paid'); ?></strong></td>
+                        <td class="emph">
+                            <strong><?php echo $currencySymbol . number_format($data['total_paid'],2); ?></strong>
+                        </td>
+                    </tr>
+                    <tr class="">
+                        <td class="label"><strong><?php echo $this->__('Total Refunded'); ?></strong></td>
+                        <td class="emph">
+                            <strong><?php echo $currencySymbol . number_format($data['total_refunded'],2); ?></strong>
+                        </td>
+                    </tr>
+                    <tr class="">
+                        <td class="label"><strong><?php echo $this->__('Total Due'); ?></strong></td>
+                        <td class="emph">
+                            <strong>
+                                <?php if($data['status']=='pending'):?>
+                                <?php echo $currencySymbol . number_format($data['grand_total'],2); ?>
+                                <?php else:?>
+                                <?php echo $currencySymbol . number_format($data['total_due'],2); ?>
+                                <?php endif;?>
+                            </strong>
+                        </td>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    <tr class="">
+                        <td class="label"><?php echo $this->__('Subtotal'); ?></td>
+                        <td>
+                            <?php echo $currencySymbol . number_format($data['subtotal'],2); ?>
+                        </td>
+                    </tr>
+                    <tr class="">
+                        <td class="label"><?php echo $this->__('Shipping & Handling '); ?></td>
+                        <td>
+                            <?php if ($data['shipping_amount']): ?>
+                                <?php echo $currencySymbol . number_format($data['shipping_amount'], 2); ?>
+                        <?php else: ?>
+                            <?php echo $this->helper('sales')->__('No shipping information available'); ?>
+                        <?php endif; ?>
+                        </td>
+                    </tr>
+                    <?php if($data['discount_amount']!=0):?>
+                    <tr class="">
+                        <td class="label"><?php echo $this->__('Discount'); ?></td>
+                        <td>
+                            <?php echo '-'.$currencySymbol . str_replace('-','',number_format($data['discount_amount'], 2)); ?>
+                        </td>
+                    </tr>
+                    <?php endif;?>
+                    <tr class="">
+                        <td class="label"><?php echo $this->__('Tax'); ?></td>
+                        <td>
+                            <?php echo $currencySymbol . number_format($data['tax_amount'], 2); ?>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+<div class="clear"></div>
+<?php } catch (Exception $ex) {
+    Mage::log($ex->getMessage());
+    ?>
+<script type="text/javascript">
+    alert("Some error occured...!!!");
+    location.href = '<?php echo Mage::getUrl('deleteorder/adminhtml_deleteorder/index');?>';
+</script>
+<?php 
+}
+    } else { ?>
+<script type="text/javascript">
+    location.href = '<?php echo Mage::getUrl('deleteorder/adminhtml_deleteorder/index');?>';
+</script>
+<?php } ?>

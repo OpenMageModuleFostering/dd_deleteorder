@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<config>
+  <modules>
+    <DD_Deleteorder>
+      <active>true</active>
+      <codePool>community</codePool>
+      <version>0.1.0</version>
+    </DD_Deleteorder>
+  </modules>
+</config>

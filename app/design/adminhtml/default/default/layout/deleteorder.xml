@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!--
+* Dynamic Dreamz
+* @category   DD
+* @package    DD_Deleteorder
+* @copyright  Copyright (c) 2014-2015 Dynamic Dreamz. (http://www.dynamicdreamz.com/)
+* @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL)
+-->
+<layout version="0.1.0">
+  <deleteorder_adminhtml_deleteorder_index>
+	<reference name="content">
+	  <block type="deleteorder/adminhtml_deleteorder" name="deleteorder" />
+	</reference>
+  </deleteorder_adminhtml_deleteorder_index>
+</layout>

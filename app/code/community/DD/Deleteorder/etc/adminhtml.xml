@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!--
+* Dynamic Dreamz
+* @category   DD
+* @package    DD_Deleteorder
+* @copyright  Copyright (c) 2014-2015 Dynamic Dreamz. (http://www.dynamicdreamz.com/)
+* @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL)
+-->
+<config>
+    <acl>
+        <resources>
+            <admin>
+                <children>
+                    <system>
+                        <children>
+                            <config>
+                                <children>
+                                    <deleteordersettings translate="title" module="deleteorder">
+                                        <title>DeleteOrder Settings Section</title>
+                                        <sort_order>0</sort_order>
+                                    </deleteordersettings>
+                                </children>
+                            </config>
+                        </children>
+                    </system>
+                </children>
+            </admin>
+        </resources>
+    </acl>
+</config>
