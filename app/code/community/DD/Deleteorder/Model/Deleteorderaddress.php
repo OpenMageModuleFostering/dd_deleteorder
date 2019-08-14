@@ -24,11 +24,11 @@ class DD_Deleteorder_Model_Deleteorderaddress extends Mage_Core_Model_Abstract {
             if (!empty($order->getData())) {
                 $billingAddress = $order->getBillingAddress();
                 $shippingAddress = $order->getShippingAddress();
-                if (is_array($billingAddress) && !empty($billingAddress)) {
+                if (!empty($billingAddress)) {
                     $model1 = $this->setData($billingAddress->getData());
                     $model1->save();
                 }
-                if (is_array($shippingAddress) && !empty($shippingAddress)) {
+                if (!empty($shippingAddress)) {
                     $model2 = $this->setData($shippingAddress->getData());
                     $model2->save();
                 }

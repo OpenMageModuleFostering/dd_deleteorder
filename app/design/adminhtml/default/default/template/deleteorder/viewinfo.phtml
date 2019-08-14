@@ -12,11 +12,17 @@ $id = $this->getRequest()->getParam('o_id');
 $data = Mage::getModel('deleteorder/deleteorder')->getOrderInfo($id);
 if($data){
     try{
+        $countryShipping = '';
+        $countryBilling = '';
         $itemData = Mage::getModel('deleteorder/deleteorderitem')->getOrderItem($data['entity_id']);
         $shippingData = Mage::getModel('deleteorder/deleteorderaddress')->getOrderShippingData($data['entity_id']);
         $billingData = Mage::getModel('deleteorder/deleteorderaddress')->getOrderBillingData($data['entity_id']);
-        $countryShipping = Mage::getModel('directory/country')->loadByCode($shippingData['country_id']);
-        $countryBilling = Mage::getModel('directory/country')->loadByCode($billingData['country_id']);
+        if(!empty($shippingData) && isset($shippingData['country_id'])){
+            $countryShipping = Mage::getModel('directory/country')->loadByCode($shippingData['country_id']);
+        }
+        if(!empty($billingData) && isset($billingData['country_id'])){
+            $countryBilling = Mage::getModel('directory/country')->loadByCode($billingData['country_id']);
+        }
         $orderAdminDate = $this->formatDate($data['created_at'], 'medium', true);
         $showIp=Mage::getStoreConfig('sales/general/hide_customer_ip');
         $currencySymbol = Mage::app()->getLocale()->currency($data['order_currency_code'])->getSymbol();
@@ -127,7 +133,9 @@ if($data){
                 echo $billingData['city'] . ' ';
                 echo $billingData['region'] . ' ';
                 echo $billingData['postcode'] . '<br/>';
-                echo $countryBilling->getName() . '<br/>';
+                if(!empty($countryBilling)){
+                    echo $countryBilling->getName() . '<br/>';
+                }
                 echo 'T: ' . $billingData['telephone'] . '<br/>';
                 if ($billingData['fax'] != '') {
                     echo 'F: ' . $billingData['fax'];
@@ -161,7 +169,9 @@ if($data){
                     echo $shippingData['city'] . ' ';
                     echo $shippingData['region'] . ' ';
                     echo $shippingData['postcode'] . '<br/>';
-                    echo $countryShipping->getName() . '<br/>';
+                    if(!empty($countryShipping)){
+                        echo $countryShipping->getName() . '<br/>';
+                    }
                     echo 'T: ' . $shippingData['telephone'] . '<br/>';
                     if ($shippingData['fax'] != '') {
                         echo 'F: ' . $shippingData['fax'];

@@ -9,7 +9,7 @@
 <config>
     <modules>
         <DD_Deleteorder>
-            <version>0.1.0</version>
+            <version>0.1.1</version>
         </DD_Deleteorder>
     </modules>
     <default>
@@ -137,7 +137,7 @@
                 <admin>
                     <children>
                         <deleteorder translate="title" module="deleteorder">
-                            <title>Deleteorder</title>
+                            <title>Delete Orders</title>
                             <sort_order>1000</sort_order>
                             <children>
                                 <deleteorder module="deleteorder">

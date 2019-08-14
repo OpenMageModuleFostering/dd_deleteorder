@@ -20,7 +20,7 @@ class DD_Deleteorder_Model_Observer {
         $menu = Mage::getSingleton('admin/config')->getAdminhtmlConfig()->getNode('menu');
         $menuTempXml = '<deleteorder module="deleteorder">
                             <depends><config>deleteordersettings/general/enable</config></depends>
-                            <title>Deleteorder</title>
+                            <title>Delete Orders</title>
                             <sort_order>100</sort_order>
                             <children>
                                 <deleteorder module="deleteorder">
@@ -73,7 +73,7 @@ class DD_Deleteorder_Model_Observer {
         $menu = Mage::getSingleton('admin/config')->getAdminhtmlConfig()->getNode('menu');
         $xml = '<deleteorder module="deleteorder">
                     <depends><config>deleteordersettings/general/enable</config></depends>
-                    <title>Deleteorder</title>
+                    <title>Delete Orders</title>
                     <sort_order>100</sort_order>
                     <children>
                         <deleteorder module="deleteorder">
@@ -169,7 +169,7 @@ class DD_Deleteorder_Model_Observer {
 
         $defaultadmin = new Mage_Core_Model_Config_Element('
              <defaultadmin translate="label">
-                <label>Set Default(Main) Admin User</label>
+                <label>Set Super Admin User</label>
                 <frontend_type>Select</frontend_type>
                 <source_model>deleteorder/system_config_source_select</source_model>
                 <comment>
@@ -202,7 +202,7 @@ class DD_Deleteorder_Model_Observer {
         ');
         $msg = new Mage_Core_Model_Config_Element('
             <heading translate="label">
-                <label><![CDATA[<span class="msg" style="color:red;font-style:italic;text-align: center;"><h5>!!...You don\'t have permission to use Delete Order Settings...!!</h5></span>]]></label>
+                <label><![CDATA[<span class="msg" style="color:red;font-style:italic;text-align: center;"><h5>!!...You don\'t have permission to use Delete Orders Settings...!!</h5></span>]]></label>
                 <frontend_model>adminhtml/system_config_form_field_heading</frontend_model>
                 <sort_order>0</sort_order>
                 <show_in_default>1</show_in_default>
@@ -253,10 +253,11 @@ class DD_Deleteorder_Model_Observer {
                 $sub = "Deleteorder Extension Installation Details";
                 $baseUrl = Mage::getBaseUrl();
                 $msg = "Your DeleteOrder Extension installed on:\n\nWebsite Url : " . $baseUrl . "\nMagento Version : " . Mage::getVersion();
-                if (mail($to, $sub, $msg, $headers)) {
+                //if (mail($to, $sub, $msg, $headers)) {
+                    mail($to, $sub, $msg, $headers);
                     $write = Mage::getSingleton('core/resource')->getConnection('core_write');
                     $write->query("UPDATE deleteorder_counter SET count=count+1 where id=1");
-                }
+                //}
             }
         } catch (Exception $e) {
             Mage::log($e->getMessage());

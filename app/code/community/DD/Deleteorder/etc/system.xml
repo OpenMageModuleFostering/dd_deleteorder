@@ -15,7 +15,7 @@
     </tabs>
     <sections>
         <deleteordersettings  translate="label" module="deleteorder">                    
-            <label>Delete Order Settings</label>
+            <label>Delete Orders Settings</label>
             <tab>dd_deleteorder</tab>
             <frontend_type>text</frontend_type>
             <sort_order>0</sort_order>
