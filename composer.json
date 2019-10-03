@@ -1,7 +1,7 @@
 {
-    "name": "OpenMageModuleFostering\/DD_Deleteorder",
+    "name": "openmage-module-fostering\/dd_deleteorder",
     "type": "magento-module",
-    "license": "Open-Software-License-(OSL)",
+    "license": "OSL-3.0",
     "homepage": "",
     "description": "By this extension admin can delete the orders and backed up the deleted orders history.",
     "authors": [
